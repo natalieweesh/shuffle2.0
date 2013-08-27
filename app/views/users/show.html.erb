@@ -1,0 +1,242 @@
+<script type="application/json" id="random-song">
+  <%= @song.to_json.html_safe %>
+</script>
+
+<section>
+
+<% if @user %>
+<strong class="hinge_me"><%= @user.email %></strong>
+<span class="righty signout"><a href="<%= destroy_user_session_url %>" data-method="delete" rel="nofollow">sign out</a></span>
+<% end %>
+</section>
+
+<section class="scoreboard">
+<h6>points you've racked up</h6>
+<h4><%= @user.get_score %></h4>
+</section>
+
+<section class="cont">
+<label class="color-change">continuous play
+<input class="auto-cont" type="checkbox">
+</label>
+</section>
+<a href="#" class="qmark color-change">?</a>
+
+<div class="floater">
+  <strong style="font-size: 1.1em;">navigation!</strong><br>
+  right to play next song<br>
+  up to upvote<br>
+  down to downvote<br>
+  left to see history<br>
+  spacebar to play/pause
+</div>
+
+<div class="natalie circle fadeInLeftBig">
+  
+</div>
+
+<section class="enter-stuff">
+<form method="post">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+<label class="color-change">share a new song</label><br>
+<label>artist:
+<input type="text" name="song[artist]" class="auto-box"></input>
+</label>
+<br>
+<label>song:
+<input type="text" name="song[title]" class="auto-song-box"></input>
+</label><br>
+<input type="submit" class="gadget" value="GO GADGET GO!">
+</form>
+</section>
+
+<script src="http://toma.hk/api.js?v=1"></script>
+
+<script type="application/javascript">
+$(document).ready($('.qmark').addClass("animated rotateIn"));
+
+$(document).ready($('.circle').addClass('animated fadeInLeftBig'));
+
+$('.auto-box').autocomplete({
+  source: function(request, response){
+    $.ajax({url: "http://developer.echonest.com/api/v4/artist/suggest",
+      data: {"api_key": "FILDTEOIK2HBORODV", "name": request.term, "results": 10},
+      type: "get"}).done(function(data){ 
+        response(data["response"]["artists"].map(function(x){return x.name}));
+      })
+    }
+});
+
+
+$('.gadget').on("click", function(event){
+  event.preventDefault();
+  $.ajax({
+    url: "<%= song_url %>" + ".json",
+    type: "POST",
+    data: $(this.form).serialize(),
+      
+  }).done(function(song){
+    alert("donedonedone");
+    
+    $('input[name=song\\[title\\]]').val("");
+    $('input[name=song\\[artist\\]]').val("");
+    
+    $.ajax({
+      url: "<%= user_uploadeds_url %>",
+      type: "POST",
+      data: {"user_uploaded": {"user_id": "<%= @user.id %>", "song_id": song.id}}
+    }).done($('body').append("successfully added song!!!"));
+    
+    
+  });
+  
+  
+});
+
+var autocontinue = false;
+$('.auto-cont').on("click", function(){
+  autocontinue = $('.auto-cont').is(':checked')
+})
+
+var random_song = JSON.parse($('#random-song').html());
+var song_id;
+var processTrack = function (title, artist, id){
+  song_id = id;
+  var track;
+  var that = this;
+  track = window.tomahkAPI.Track(title,
+      artist, 
+      {
+      width: 250,
+      height: 250,
+      disabledResolvers: ["SpotifyMetadata"],
+          // options: "SoundCloud", "Officialfm", "Lastfm", "Jamendo", "Youtube", "Rdio", "SpotifyMetadata", "Deezer", "Exfm"
+      handlers: {
+          onloaded: function() {
+          },
+          onended: function() {
+            //make ajax query if autocomplete = true
+            alert("song ended!");
+            if(autocontinue){
+              $.ajax({
+                url: "/user_histories",
+                type: "POST",
+                data: {"user_history": {"song_id": song_id, "user_id": "<%= @user.id %>"}},
+                success: function(response) {
+                  $.ajax({
+                    url: "<%= song_url %>.json",
+                    type: "get"
+                  }).done(function(data){
+                    new_track = processTrack(data.title, data.artist, data.id)
+                    $('.natalie').html(new_track.render())
+                  })
+                },
+                error: function(response, arg, error) {
+          
+                }
+              });
+              return false;
+            }
+          },
+          onplayable: function() {
+            if(autocontinue)
+              new_track.play();
+          },
+          onresolved: function(resolver, result) {
+          },
+      }
+  });
+  return track;
+}
+
+var new_track = processTrack(random_song.title, random_song.artist, random_song.id)
+
+$('.natalie').append(new_track.render())
+
+$(document).keydown(function(e){
+  if ($('.auto-box').is(":focus")) {
+    
+  } else {
+    if (e.keyCode == 32) { /* space */
+      new_track.play();
+      return false;
+    }
+    
+    if (e.keyCode == 40) { /* down */
+      
+      
+      $.ajax({
+        url: "/polarities",
+        type: "POST",
+        data: {"polarity": {"song_id": song_id, "is_good": "false", "user_id": "<%= @user.id %>"}},
+        success: function(response) {
+        },
+        error: function(response, arg, error) {
+        }
+      });
+      
+      
+      return false;
+    }
+    
+    
+    if (e.keyCode == 38) { /* up */
+      
+      $.ajax({
+        url: "/polarities",
+        type: "POST",
+        data: {"polarity": {"song_id": song_id, "is_good": "true", "user_id": "<%= @user.id %>"}},
+        success: function(response) {
+          //make the thing glowwwww
+        },
+        error: function(response, arg, error) {
+        }
+      });
+   
+      return false;
+    }
+    
+    
+    
+    if (e.keyCode == 39) { /* right */
+      
+      $.ajax({
+        url: "/user_histories",
+        type: "POST",
+        data: {"user_history": {"song_id": song_id, "user_id": "<%= @user.id %>"}},
+        success: function(response) {
+          $(".circle").addClass("animated fadeOutRightBig");
+          $.ajax({
+            url: "<%= song_url %>.json",
+            type: "get"
+          }).done(function(data){
+            new_track = processTrack(data.title, data.artist, data.id)
+            
+            $('.natalie').html(new_track.render())
+            $(".circle").removeClass("animated fadeOutRightBig");
+            $(".circle").addClass("animated fadeInLeftBig");
+          })
+        },
+        error: function(response, arg, error) {
+          
+        }
+      });
+      
+      return false;
+    }
+    
+    
+    
+    if (e.keyCode == 37) { /* left */
+      //SHOW HISTORY
+       return false;
+    }
+    
+    
+    
+    
+  }
+})
+
+
+</script>
