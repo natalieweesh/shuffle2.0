@@ -14,7 +14,7 @@
 <h6>points you've racked up</h6>
 <h4><%= @user.get_score %></h4>
 </section>
-
+<section id="message"></section>
 <section class="cont">
 <label class="color-change">continuous play
 <input class="auto-cont" type="checkbox">
@@ -76,7 +76,7 @@ $('.gadget').on("click", function(event){
     data: $(this.form).serialize(),
       
   }).done(function(song){
-    alert("donedonedone");
+    // alert("donedonedone");
     
     $('input[name=song\\[title\\]]').val("");
     $('input[name=song\\[artist\\]]').val("");
@@ -85,7 +85,7 @@ $('.gadget').on("click", function(event){
       url: "<%= user_uploadeds_url %>",
       type: "POST",
       data: {"user_uploaded": {"user_id": "<%= @user.id %>", "song_id": song.id}}
-    }).done($('body').append("successfully added song!!!"));
+    }).done($('#message').html("<p>successfully added " + song.title + " !!!</p>"));
     
     
   });
@@ -154,7 +154,7 @@ var new_track = processTrack(random_song.title, random_song.artist, random_song.
 $('.natalie').append(new_track.render())
 
 $(document).keydown(function(e){
-  if ($('.auto-box').is(":focus")) {
+  if ($('.auto-box').is(":focus") || $('.auto-song-box').is(':focus')) {
     
   } else {
     if (e.keyCode == 32) { /* space */
