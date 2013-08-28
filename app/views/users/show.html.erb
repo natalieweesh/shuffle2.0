@@ -9,6 +9,15 @@
 <span class="righty signout"><a href="<%= destroy_user_session_url %>" data-method="delete" rel="nofollow">sign out</a></span>
 <% end %>
 </section>
+<div class="history-panel hide-me" style="padding: 20px; width: 200px; background: pink; position: absolute; float: right;">
+  <h4>your past few songs</h4>
+  <ol>
+    <% @user.user_histories[0..9].each do |song| %>
+    <li><%= song.song.title %></li>
+    <% end %>
+  </ol>
+</div>
+
 
 <section class="scoreboard">
 <h6>points you've racked up</h6>
@@ -34,6 +43,7 @@
 <div class="natalie circle fadeInLeftBig">
   
 </div>
+
 
 <section class="enter-stuff">
 <form method="post">
@@ -259,6 +269,7 @@ $(document).keydown(function(e){
     
     if (e.keyCode == 37) { /* left */
       //SHOW HISTORY
+      $('.history-panel').toggleClass('hide-me');
        return false;
     }
     
