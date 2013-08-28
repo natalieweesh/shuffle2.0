@@ -153,6 +153,21 @@ h1 {
   transition: all 1s ease-in-out;
   
 }
+.history-panel {
+  width: 200px;
+  background: rgba(255, 255, 0, 0.7);
+  position: absolute;
+  float: right;
+  overflow: auto;
+  text-align: left;
+  top: 0;
+}
+.history-panel p {
+  text-align: center;
+  background: yellow;
+  padding: 10px 0;
+}
 .hide-me {
   display: none;
+
 }
