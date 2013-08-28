@@ -255,10 +255,10 @@ $(document).keydown(function(e){
       return false;
     }
     
-    
-    
     if (e.keyCode == 37) { /* left */
-      //SHOW HISTORY
+      $.get("<%= user_histories_url %>").done(function(data){
+        console.log(data);
+      })
        return false;
     }
     

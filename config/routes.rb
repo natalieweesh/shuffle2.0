@@ -13,7 +13,7 @@ ShuffleApp::Application.routes.draw do
   resource :song, only: [:show, :create]
   resources :polarities, only: [:create]
   
-  resources :user_histories, only: [:create]
+  resources :user_histories, only: [:create, :index]
   resources :user_uploadeds, only: [:create]
   root :to => "users#show"  
 
