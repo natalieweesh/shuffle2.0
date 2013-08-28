@@ -123,10 +123,10 @@ h1 {
 
 .floater {
   padding: 5px;
-  float: left;
+  float: right;
   padding-top: 25px;
   margin-top: -25px;
-  margin-left: 25px;
+  margin-left: 590px;
   position: fixed;
   background: transparent;
   width: 200px;
@@ -140,7 +140,7 @@ h1 {
   display: block;
   position: relative;
   text-decoration: none;
-  margin-left: -440px;
+  margin-left: 400px;
   font-size: 2em;
 }
 .qmark:hover {

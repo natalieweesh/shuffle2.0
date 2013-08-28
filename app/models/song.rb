@@ -7,6 +7,8 @@ class Song < ActiveRecord::Base
   has_many :user_histories
   has_many :listeners, through: :user_histories, source: :user
 
+  has_many :polarities
+
     def self.get_random(cu)
     @merged_arrays = cu.uploaded_songs.pluck(:id) + cu.history_songs.pluck(:id)
     unless @merged_arrays.empty?

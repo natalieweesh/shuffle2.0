@@ -8,7 +8,7 @@ class UserHistoriesController < ApplicationController
   end
 
   def index
-    @user_histories = Song.joins(:user_histories).where('user_id = ?', current_user.id).pluck("title")
+    @user_histories = Song.joins(:user_histories).where('user_id = ?', current_user.id).limit(10).pluck("title").uniq
     respond_to do |format|
       format.json {render :json => @user_histories}
     end
