@@ -1,7 +1,7 @@
 ShuffleApp::Application.routes.draw do
 
+  get "passthrough/get"
   get "songs/show"
-
   get "users/show"
 
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }

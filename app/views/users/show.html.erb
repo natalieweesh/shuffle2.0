@@ -59,10 +59,18 @@ $(document).ready($('.circle').addClass('animated fadeInLeftBig'));
 
 $('.auto-box').autocomplete({
   source: function(request, response){
-    $.ajax({url: "http://developer.echonest.com/api/v4/artist/suggest",
-      data: {"api_key": "FILDTEOIK2HBORODV", "name": request.term, "results": 10},
-      type: "get"}).done(function(data){ 
-        response(data["response"]["artists"].map(function(x){return x.name}));
+    var apiurl = "http://developer.echonest.com/api/v4/artist/suggest";
+    var currentHost = window.location.hostname;
+    if (window.location.port.length)
+      currentHost += ":" + window.location.port;
+    $.get("http://" + currentHost + "/passthrough/get",
+      {apiurl: apiurl, type: "json", 
+      params: {api_key: "CFIRP1JV9U7LRKRRM",
+               name: request.term,
+               results: 10}}).done(function(data){ 
+                var data = JSON.parse(data)
+                console.log(data["response"]["artists"])
+        response(data["response"]["artists"].map(function(x){return x["name"]}));
       })
     }
 });
