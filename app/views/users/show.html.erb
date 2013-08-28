@@ -175,6 +175,28 @@ $(document).keydown(function(e){
         }
       });
       
+      $.ajax({
+        url: "/user_histories",
+        type: "POST",
+        data: {"user_history": {"song_id": song_id, "user_id": "<%= @user.id %>"}},
+        success: function(response) {
+          $(".circle").addClass("animated fadeOutRightBig");
+          $.ajax({
+            url: "<%= song_url %>.json",
+            type: "get"
+          }).done(function(data){
+            new_track = processTrack(data.title, data.artist, data.id)
+            
+            $('.natalie').html(new_track.render())
+            $(".circle").removeClass("animated fadeOutRightBig");
+            $(".circle").addClass("animated fadeInLeftBig");
+          })
+        },
+        error: function(response, arg, error) {
+          
+        }
+      });
+      
       
       return false;
     }
